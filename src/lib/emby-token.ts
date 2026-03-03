@@ -3,7 +3,7 @@ import { getAuthInfoFromCookie } from './auth';
 
 /**
  * 获取用于代理的 token
- * 优先级：全局 token > 用户 token > null
+ * 优先级：全局 token > 用户 token（从 cookie 获取）> null
  */
 export async function getProxyToken(request?: NextRequest): Promise<string | null> {
   // 1. 尝试获取全局 token
@@ -18,9 +18,10 @@ export async function getProxyToken(request?: NextRequest): Promise<string | nul
     if (authInfo && authInfo.username) {
       try {
         const { db } = await import('./db');
-        const userInfo = await db.getUserInfoV2(authInfo.username);
-        if (userInfo && userInfo.tvboxToken && !userInfo.banned) {
-          return userInfo.tvboxToken;
+        // 通过用户名获取用户的 tvbox token
+        const userToken = await db.getTvboxSubscribeToken(authInfo.username);
+        if (userToken) {
+          return userToken;
         }
       } catch (error) {
         // 忽略错误，继续

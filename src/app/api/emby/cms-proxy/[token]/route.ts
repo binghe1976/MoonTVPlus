@@ -92,7 +92,7 @@ export async function GET(
       if (ac === 'detail') {
         return await handleDetailBySearch(client, wd, requestToken, embyKey, request);
       }
-      return await handleSearch(client, wd);
+      return await handleSearch(client, wd, requestToken);
     } else if (ids || ac === 'detail') {
       // 详情模式
       if (!ids) {
@@ -109,7 +109,7 @@ export async function GET(
       return await handleDetail(client, ids, requestToken, embyKey, request);
     } else {
       // 列表模式
-      return await handleSearch(client, '');
+      return await handleSearch(client, '', requestToken);
     }
   } catch (error) {
     console.error('[Emby CMS Proxy] 错误:', error);
@@ -128,7 +128,7 @@ export async function GET(
 /**
  * 处理搜索请求
  */
-async function handleSearch(client: EmbyClient, query: string) {
+async function handleSearch(client: EmbyClient, query: string, token: string) {
   const result = await client.getItems({
     searchTerm: query || undefined,
     IncludeItemTypes: 'Movie,Series',
@@ -140,7 +140,7 @@ async function handleSearch(client: EmbyClient, query: string) {
   const list = result.Items.map((item) => ({
     vod_id: item.Id,
     vod_name: item.Name,
-    vod_pic: client.getImageUrl(item.Id, 'Primary', undefined, requestToken),
+    vod_pic: client.getImageUrl(item.Id, 'Primary', undefined, token),
     vod_remarks: item.Type === 'Movie' ? '电影' : '剧集',
     vod_year: item.ProductionYear?.toString() || '',
     vod_content: item.Overview || '',
@@ -247,7 +247,7 @@ async function handleDetail(
       {
         vod_id: item.Id,
         vod_name: item.Name,
-        vod_pic: client.getImageUrl(item.Id, 'Primary', undefined, requestToken),
+        vod_pic: client.getImageUrl(item.Id, 'Primary', undefined, token),
         vod_remarks: item.Type === 'Movie' ? '电影' : '剧集',
         vod_year: item.ProductionYear?.toString() || '',
         vod_content: item.Overview || '',
