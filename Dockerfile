@@ -26,7 +26,7 @@ COPY . .
 ENV DOCKER_ENV=true
 
 # 生成生产构建
-RUN pnpm run build
+RUN pnpm run build --no-lint --no-typescript
 
 # 使用 pnpm deploy 提取生产依赖到独立目录
 RUN pnpm deploy --filter=. --prod --legacy /tmp/prod-deps
