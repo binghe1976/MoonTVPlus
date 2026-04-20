@@ -1,36 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // 输出 standalone 模式，用于 Docker 部署
   output: 'standalone',
+
+  // 忽略构建时的类型错误和 ESLint 错误，确保构建过程不被阻断
   typescript: {
     ignoreBuildErrors: true,
   },
   eslint: {
     ignoreDuringBuilds: true,
-  },
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      // 客户端构建时，将所有 Node.js 核心模块设为空模块
-      config.resolve.fallback = {
-        fs: false,
-        net: false,
-        tls: false,
-        dns: false,
-        path: false,
-        crypto: false,
-        stream: false,
-        http: false,
-        https: false,
-        zlib: false,
-        url: false,
-        util: false,
-        assert: false,
-        buffer: false,
-        events: false,
-        os: false,
-        child_process: false,
-      };
-    }
-    return config;
   },
 }
 
